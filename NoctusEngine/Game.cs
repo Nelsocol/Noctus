@@ -35,15 +35,18 @@ namespace NoctusEngine
         {
             while (true) 
             {
+                //Execute behavior in the .lua file and parse .txt file for this node
                 LuaContext.DoString(File.ReadAllText(Directory.GetFiles("./game", $"{CurrentNode}.lua", SearchOption.AllDirectories)[0]));
                 List<string> passageLines = Parser.ParsePassage(File.ReadAllText(Directory.GetFiles("./game", $"{CurrentNode}.txt", SearchOption.AllDirectories)[0]));
 
+                //Individually present each line from the txt file
                 foreach (string line in passageLines) 
                 {
                     Console.WriteLine(line);
                     Console.ReadKey(true);
                 }
 
+                //Present links and direct game flow to one selected link.
                 List<Link> outLinks = new List<Link>();
                 int counter = 1;
                 foreach (string line in File.ReadAllLines(Directory.GetFiles("./game", $"{CurrentNode}.links", SearchOption.AllDirectories)[0]))
