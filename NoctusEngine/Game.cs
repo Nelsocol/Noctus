@@ -25,7 +25,7 @@ namespace NoctusEngine
         private void BuildMetadataTree() 
         {
             LuaContext.DoString("metadata = {}");
-            foreach (string file in Directory.EnumerateFiles("./game", "*.meta", SearchOption.AllDirectories)) 
+            foreach (string file in Directory.EnumerateFiles("./game", "*.header", SearchOption.AllDirectories)) 
             {
                 LuaContext.DoString($"metadata[\"{Path.GetFileNameWithoutExtension(file)}\"] = {{{File.ReadAllText(file)}}}");
             }
