@@ -1,6 +1,7 @@
 ﻿using NLua;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -15,10 +16,10 @@ namespace NoctusEngine
             LuaContext = luaContext;
         }
 
-        public Link ParseLink(string input) 
+        public Link ParseLink(string input, string rootDirectory) 
         {
             LinkDataBuffer linkBuffers = new LinkDataBuffer(input);
-            Link returnLink = new Link(ParsePassage(linkBuffers.Buffers['\0'])[0], ParsePassage(linkBuffers.Buffers['>'])[0], linkBuffers.Buffers['#'], linkBuffers.Buffers['<']);
+            Link returnLink = new Link(ParsePassage(linkBuffers.Buffers['\0'], rootDirectory)[0], ParsePassage(linkBuffers.Buffers['>'], rootDirectory)[0], linkBuffers.Buffers['#'], linkBuffers.Buffers['<']);
             if (linkBuffers.Buffers['?'] != "") 
             {
                 returnLink.ShowState = (bool)LuaContext.DoString($"return {linkBuffers.Buffers['?']}")[0];
@@ -27,7 +28,7 @@ namespace NoctusEngine
             return returnLink;
         }
 
-        public List<string> ParsePassage(string rawText) 
+        public List<string> ParsePassage(string rawText, string rootdirectory) 
         {
             List<StringBuilder> parsedLines = new List<StringBuilder>();
             StringBuilder currentLine = new StringBuilder();
@@ -39,7 +40,7 @@ namespace NoctusEngine
 
                 for (int i = 0; i < splitLine.Count(); i++)
                 {           
-                    currentLine.Append($"{ParseWord(splitLine, ref i, ref recursivePotential)} ");
+                    currentLine.Append($"{ParseWord(splitLine, rootdirectory, ref i, ref recursivePotential)} ");
                 }
 
                 parsedLines.Add(currentLine);
@@ -52,7 +53,7 @@ namespace NoctusEngine
             {
                 foreach (string line in parsedLines.Select(e => e.ToString().Trim()))
                 {
-                    recursiveReturnList.AddRange(ParsePassage(line));
+                    recursiveReturnList.AddRange(ParsePassage(line, rootdirectory));
                 }
             }
             else 
@@ -63,7 +64,7 @@ namespace NoctusEngine
             return recursiveReturnList;
         }
 
-        private string ParseWord(string[] line, ref int iterator, ref bool recursivePotential) 
+        private string ParseWord(string[] line,string rootDirectory, ref int iterator, ref bool recursivePotential) 
         {
             if (line[iterator].StartsWith("${"))
             {
@@ -75,6 +76,12 @@ namespace NoctusEngine
                 recursivePotential = true;
                 LuaContext.DoString($"{ParseCodeBlock(line, "]", ref iterator)}");
                 return "";
+            }
+            else if (line[iterator].StartsWith("$>"))
+            {
+                recursivePotential = true;
+                LuaContext.DoString(File.ReadAllText(Directory.GetFiles(rootDirectory, $"{line[iterator][2..]}.lua", SearchOption.AllDirectories)[0]));
+                return File.ReadAllText(Directory.GetFiles(rootDirectory, $"{line[iterator][2..]}.txt", SearchOption.AllDirectories)[0]);
             }
             else if (line[iterator].StartsWith("$"))
             {

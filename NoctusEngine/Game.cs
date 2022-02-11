@@ -54,7 +54,7 @@ namespace NoctusEngine
 
                 //Execute behavior in the .lua file and parse .txt file for this node
                 LuaContext.DoString(File.ReadAllText(Directory.GetFiles(rootDir, $"{CurrentNode}.lua", SearchOption.AllDirectories)[0]));
-                List<string> passageLines = Parser.ParsePassage(File.ReadAllText(Directory.GetFiles(rootDir, $"{CurrentNode}.txt", SearchOption.AllDirectories)[0]));
+                List<string> passageLines = Parser.ParsePassage(File.ReadAllText(Directory.GetFiles(rootDir, $"{CurrentNode}.txt", SearchOption.AllDirectories)[0]), rootDir);
 
                 //Individually present each line from the txt file
                 foreach (string line in passageLines) 
@@ -65,7 +65,7 @@ namespace NoctusEngine
 
                 //Present links and direct game flow to one selected link.
                 int counter = 1;
-                List<Link> outLinks = File.ReadAllLines(Directory.GetFiles(rootDir, $"{CurrentNode}.links", SearchOption.AllDirectories)[0]).Select(e => Parser.ParseLink(e)).ToList();
+                List<Link> outLinks = File.ReadAllLines(Directory.GetFiles(rootDir, $"{CurrentNode}.links", SearchOption.AllDirectories)[0]).Select(e => Parser.ParseLink(e, rootDir)).ToList();
                 if (outLinks.Count > 1) {
                     foreach (Link link in outLinks.Where(e => e.ShowState))
                     {

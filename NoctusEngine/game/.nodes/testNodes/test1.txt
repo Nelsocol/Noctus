@@ -6,3 +6,4 @@ This var is unassigned: $unassigned
 Check route variable: $route
 You passed me the arg: $CURRENT_NODE.ARGS.passed_arg
 $recursive_test
+$>stub
