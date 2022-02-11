@@ -23,6 +23,7 @@ namespace NoctusEditor
         {
             RootDir = GetDirectory();
             PopulateTreeViewFromPath(RootDir, treeView1);
+            treeView1.SelectedNode = treeView1.Nodes.Find("start", true)[0];
         }
 
         private string GetDirectory() 
@@ -44,9 +45,17 @@ namespace NoctusEditor
         {
             foreach (string filePath in Directory.GetFiles(RootDir, "*.header", SearchOption.AllDirectories)) 
             {
-                target.Nodes.Add(new TreeViewPassageNode() { NodePath = filePath.Substring(0, filePath.Length - 4), Text = Path.GetFileNameWithoutExtension(filePath) });
+                target.Nodes.Add(new TreeViewPassageNode() { NodePath = filePath.Substring(0, filePath.Length - 7), Text = Path.GetFileNameWithoutExtension(filePath), Name = Path.GetFileNameWithoutExtension(filePath) });
             }
             target.Refresh();
+        }
+
+        private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            headerTextBox.Text = File.ReadAllText($"{(e.Node as TreeViewPassageNode).NodePath}.header");
+            passageTextBox.Text = File.ReadAllText($"{(e.Node as TreeViewPassageNode).NodePath}.txt");
+            luaTextBox.Text = File.ReadAllText($"{(e.Node as TreeViewPassageNode).NodePath}.lua");
+            linksTextBox.Text = File.ReadAllText($"{(e.Node as TreeViewPassageNode).NodePath}.links");
         }
     }
 }
