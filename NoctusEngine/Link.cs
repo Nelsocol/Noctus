@@ -9,12 +9,14 @@ namespace NoctusEngine
         public string DisplayName { get; set; }
         public string PassageName { get; set; }
         public bool ShowState { get; set; }
+        public string Behavior { get; set; }
 
-        public Link(string displayName, string passageName, bool showState = true) 
+        public Link(string displayName, string passageName, string behavior, bool showState = true) 
         {
             DisplayName = displayName;
             PassageName = passageName;
             ShowState = showState;
+            Behavior = behavior;
         }
     }
 }

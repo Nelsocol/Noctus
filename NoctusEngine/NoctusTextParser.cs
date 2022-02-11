@@ -17,8 +17,13 @@ namespace NoctusEngine
 
         public Link ParseLink(string input) 
         {
-            string[] components = input.Split(new string[1]{"->"}, StringSplitOptions.RemoveEmptyEntries);
-            Link returnLink = new Link(components[0], components[1]);
+            LinkDataBuffer linkBuffers = new LinkDataBuffer(input);
+            Link returnLink = new Link(ParsePassage(linkBuffers.Buffers['\0'])[0], ParsePassage(linkBuffers.Buffers['>'])[0], linkBuffers.Buffers['#']);
+            if (linkBuffers.Buffers['?'] != "") 
+            {
+                returnLink.ShowState = (bool)LuaContext.DoString($"return {linkBuffers.Buffers['?']}")[0];
+            }
+
             return returnLink;
         }
 
@@ -31,26 +36,57 @@ namespace NoctusEngine
             foreach (string line in lines) {
                 string[] splitLine = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-                foreach (string word in splitLine)
+                for (int i = 0; i < splitLine.Count(); i++)
                 {           
-                    currentLine.Append($"{ParseWord(word)} ");
+                    currentLine.Append($"{ParseWord(splitLine, ref i)} ");
                 }
 
                 parsedLines.Add(currentLine);
                 currentLine = new StringBuilder();
             }
 
-            return parsedLines.Select(e => e.ToString()).ToList();
+            return parsedLines.Select(e => e.ToString().Trim()).ToList();
         }
 
-        private string ParseWord(string word) 
+        private string ParseWord(string[] line, ref int iterator) 
         {
-            if (word.StartsWith("$"))
+            if (line[iterator].StartsWith("${"))
             {
-                return LuaContext[word[1..]]?.ToString() ?? "UNASSIGNED_VAR";
+                return LuaContext.DoString($"return {ParseCodeBlock(line, "}", ref iterator)}")[0]?.ToString() ?? "MALFORMED_STATEMENT";
+            }
+            else if (line[iterator].StartsWith("$["))
+            {
+                LuaContext.DoString($"{ParseCodeBlock(line, "]", ref iterator)}");
+                return "";
+            }
+            else if (line[iterator].StartsWith("$"))
+            {
+                return LuaContext.DoString($"return {line[iterator][1..]}")[0]?.ToString() ?? "UNASSIGNED_VAR";
             }
 
-            return word;
+            return line[iterator];
+        }
+
+        private string ParseCodeBlock(string[] line, string endDelimiter, ref int iterator)
+        {
+            StringBuilder codeFragment = new StringBuilder();
+
+            if (line[iterator].EndsWith(endDelimiter))
+            {
+                codeFragment.Append(line[iterator]);
+            }
+            else
+            {
+                while (!line[iterator].EndsWith(endDelimiter))
+                {
+                    codeFragment.Append(line[iterator] + " ");
+                    iterator++;
+                }
+
+                codeFragment.Append(line[iterator]);
+            }
+
+            return codeFragment.ToString()[2..^1];
         }
     }
 }

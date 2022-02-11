@@ -6,7 +6,7 @@ namespace NoctusEngine
     {
         static void Main(string[] args)
         {
-            Game game = new Game();
+            Game game = new Game(args[0]);
             game.Run();
         }
     }

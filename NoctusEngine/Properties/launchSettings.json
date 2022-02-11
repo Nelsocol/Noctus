@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NoctusEngine": {
+      "commandName": "Project",
+      "commandLineArgs": "./game"
+    }
+  }
+}

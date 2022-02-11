@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace NoctusEngine
@@ -11,23 +12,34 @@ namespace NoctusEngine
         private Lua LuaContext { get; }
         private NoctusTextParser Parser { get; }
         private IInputChannel InputChannel { get; }
+        private string rootDir { get; }
         private string CurrentNode;
 
-        public Game() 
+        public Game(string gameDirectory) 
         {
+            rootDir = gameDirectory;
             LuaContext = new Lua();
             Parser = new NoctusTextParser(LuaContext);
             InputChannel = new ConsoleInputChannel();
             BuildMetadataTree();
+            RunNlibFiles();
             CurrentNode = "start";
         }
 
         private void BuildMetadataTree() 
         {
             LuaContext.DoString("metadata = {}");
-            foreach (string file in Directory.EnumerateFiles("./game", "*.header", SearchOption.AllDirectories)) 
+            foreach (string file in Directory.EnumerateFiles(rootDir, "*.header", SearchOption.AllDirectories)) 
             {
                 LuaContext.DoString($"metadata[\"{Path.GetFileNameWithoutExtension(file)}\"] = {{{File.ReadAllText(file)}}}");
+            }
+        }
+
+        private void RunNlibFiles()
+        {
+            foreach (string file in Directory.EnumerateFiles(rootDir, "*.nlib", SearchOption.AllDirectories))
+            {
+                LuaContext.DoFile(file);
             }
         }
 
@@ -35,9 +47,12 @@ namespace NoctusEngine
         {
             while (true) 
             {
+                //Clear Console
+                Console.Clear();
+
                 //Execute behavior in the .lua file and parse .txt file for this node
-                LuaContext.DoString(File.ReadAllText(Directory.GetFiles("./game", $"{CurrentNode}.lua", SearchOption.AllDirectories)[0]));
-                List<string> passageLines = Parser.ParsePassage(File.ReadAllText(Directory.GetFiles("./game", $"{CurrentNode}.txt", SearchOption.AllDirectories)[0]));
+                LuaContext.DoString(File.ReadAllText(Directory.GetFiles(rootDir, $"{CurrentNode}.lua", SearchOption.AllDirectories)[0]));
+                List<string> passageLines = Parser.ParsePassage(File.ReadAllText(Directory.GetFiles(rootDir, $"{CurrentNode}.txt", SearchOption.AllDirectories)[0]));
 
                 //Individually present each line from the txt file
                 foreach (string line in passageLines) 
@@ -47,15 +62,18 @@ namespace NoctusEngine
                 }
 
                 //Present links and direct game flow to one selected link.
-                List<Link> outLinks = new List<Link>();
                 int counter = 1;
-                foreach (string line in File.ReadAllLines(Directory.GetFiles("./game", $"{CurrentNode}.links", SearchOption.AllDirectories)[0]))
-                {
-                    Link link = Parser.ParseLink(line);
-                    Console.WriteLine($"{counter++}: {link.DisplayName}");
-                    outLinks.Add(link);
+                List<Link> outLinks = File.ReadAllLines(Directory.GetFiles(rootDir, $"{CurrentNode}.links", SearchOption.AllDirectories)[0]).Select(e => Parser.ParseLink(e)).ToList();
+                if (outLinks.Count > 1) {
+                    foreach (Link link in outLinks.Where(e => e.ShowState))
+                    {
+                        Console.WriteLine($"{counter++}: {link.DisplayName}");
+                    }
                 }
-                CurrentNode = InputChannel.SelectLink(outLinks).PassageName;
+
+                Link selectedLink = InputChannel.SelectLink(outLinks);
+                LuaContext.DoString(selectedLink.Behavior);
+                CurrentNode = selectedLink.PassageName;
             }
         }
     }
