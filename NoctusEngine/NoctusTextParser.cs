@@ -18,7 +18,7 @@ namespace NoctusEngine
         public Link ParseLink(string input) 
         {
             LinkDataBuffer linkBuffers = new LinkDataBuffer(input);
-            Link returnLink = new Link(ParsePassage(linkBuffers.Buffers['\0'])[0], ParsePassage(linkBuffers.Buffers['>'])[0], linkBuffers.Buffers['#']);
+            Link returnLink = new Link(ParsePassage(linkBuffers.Buffers['\0'])[0], ParsePassage(linkBuffers.Buffers['>'])[0], linkBuffers.Buffers['#'], linkBuffers.Buffers['<']);
             if (linkBuffers.Buffers['?'] != "") 
             {
                 returnLink.ShowState = (bool)LuaContext.DoString($"return {linkBuffers.Buffers['?']}")[0];
@@ -32,35 +32,53 @@ namespace NoctusEngine
             List<StringBuilder> parsedLines = new List<StringBuilder>();
             StringBuilder currentLine = new StringBuilder();
 
+            bool recursivePotential = false;
             string[] lines = rawText.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
             foreach (string line in lines) {
                 string[] splitLine = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
                 for (int i = 0; i < splitLine.Count(); i++)
                 {           
-                    currentLine.Append($"{ParseWord(splitLine, ref i)} ");
+                    currentLine.Append($"{ParseWord(splitLine, ref i, ref recursivePotential)} ");
                 }
 
                 parsedLines.Add(currentLine);
                 currentLine = new StringBuilder();
             }
 
-            return parsedLines.Select(e => e.ToString().Trim()).ToList();
+            //Handles the recursive step to recursively evaluate passages
+            List<string> recursiveReturnList = new List<string>();
+            if (recursivePotential)
+            {
+                foreach (string line in parsedLines.Select(e => e.ToString().Trim()))
+                {
+                    recursiveReturnList.AddRange(ParsePassage(line));
+                }
+            }
+            else 
+            {
+                recursiveReturnList = parsedLines.Select(e => e.ToString().Trim()).ToList();
+            }
+                  
+            return recursiveReturnList;
         }
 
-        private string ParseWord(string[] line, ref int iterator) 
+        private string ParseWord(string[] line, ref int iterator, ref bool recursivePotential) 
         {
             if (line[iterator].StartsWith("${"))
             {
+                recursivePotential = true;
                 return LuaContext.DoString($"return {ParseCodeBlock(line, "}", ref iterator)}")[0]?.ToString() ?? "MALFORMED_STATEMENT";
             }
             else if (line[iterator].StartsWith("$["))
             {
+                recursivePotential = true;
                 LuaContext.DoString($"{ParseCodeBlock(line, "]", ref iterator)}");
                 return "";
             }
             else if (line[iterator].StartsWith("$"))
             {
+                recursivePotential = true;
                 return LuaContext.DoString($"return {line[iterator][1..]}")[0]?.ToString() ?? "UNASSIGNED_VAR";
             }
 

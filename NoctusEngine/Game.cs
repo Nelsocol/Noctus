@@ -28,10 +28,12 @@ namespace NoctusEngine
 
         private void BuildMetadataTree() 
         {
-            LuaContext.DoString("metadata = {}");
+            LuaContext.DoString("METADATA = {}");
             foreach (string file in Directory.EnumerateFiles(rootDir, "*.header", SearchOption.AllDirectories)) 
             {
-                LuaContext.DoString($"metadata[\"{Path.GetFileNameWithoutExtension(file)}\"] = {{{File.ReadAllText(file)}}}");
+                LuaContext.DoString($"CURRENT_NODE=METADATA.start");
+                LuaContext.DoString($"METADATA[\"{Path.GetFileNameWithoutExtension(file)}\"] = {{{File.ReadAllText(file)}}}");
+                LuaContext.DoString($"setmetatable(METADATA[\"{Path.GetFileNameWithoutExtension(file)}\"], Node)");
             }
         }
 
@@ -73,6 +75,8 @@ namespace NoctusEngine
 
                 Link selectedLink = InputChannel.SelectLink(outLinks);
                 LuaContext.DoString(selectedLink.Behavior);
+                LuaContext.DoString($"METADATA.{selectedLink.PassageName}.ARGS = {{{selectedLink.Args}}}");
+                LuaContext.DoString($"CURRENT_NODE=METADATA.{selectedLink.PassageName}");
                 CurrentNode = selectedLink.PassageName;
             }
         }

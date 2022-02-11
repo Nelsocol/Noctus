@@ -1,6 +1,0 @@
-﻿I've made it to the test node
-Good job, $test $[test = "A different string"]
-Good to hear it. ${test}
-${5 * 3 + 1}
-This var is unassigned: $unassigned
-$route

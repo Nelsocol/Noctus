@@ -6,6 +6,31 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="bin\**" />
+    <EmbeddedResource Remove="bin\**" />
+    <None Remove="bin\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="game\.nodes\start\start.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="game\.nodes\testNodes\test1.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="game\.noctus_libraries\generic_classes.nlib" />
+    <None Include="game\.nodes\start\start.header" />
+    <None Include="game\.nodes\start\start.links" />
+    <None Include="game\.nodes\start\start.lua" />
+    <None Include="game\.nodes\testNodes\test1.header" />
+    <None Include="game\.nodes\testNodes\test1.links" />
+    <None Include="game\.nodes\testNodes\test1.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="NLua" Version="1.6.0" />
   </ItemGroup>
 

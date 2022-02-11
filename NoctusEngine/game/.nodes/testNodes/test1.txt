@@ -1,0 +1,8 @@
+﻿I've made it to the test node
+Inline var: $test $[test = "A different string"]
+One word with {}: ${test}
+5 * 3 + 1 = ${5 * 3 + 1}
+This var is unassigned: $unassigned
+Check route variable: $route
+You passed me the arg: $CURRENT_NODE.ARGS.passed_arg
+$recursive_test

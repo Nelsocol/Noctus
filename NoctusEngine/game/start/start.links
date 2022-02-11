@@ -1,3 +1,0 @@
-﻿To Start Node|>start
-To Test Node |> test1 |# route="You took route 1"
-Conditional Link |> test1 |? 5 == 3+2 |# route="You took route 2"
