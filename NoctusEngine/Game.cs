@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 
@@ -17,7 +18,12 @@ namespace NoctusEngine
 
         public Game(string gameDirectory) 
         {
-            rootDir = gameDirectory;
+            if (Directory.Exists("./temp")) 
+            {
+                Directory.Delete("./temp", true);
+            }
+            ZipFile.ExtractToDirectory(gameDirectory, "./temp");
+            rootDir = "./temp";
             LuaContext = new Lua();
             Parser = new NoctusTextParser(LuaContext);
             InputChannel = new ConsoleInputChannel();

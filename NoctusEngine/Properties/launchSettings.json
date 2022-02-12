@@ -2,7 +2,7 @@
   "profiles": {
     "NoctusEngine": {
       "commandName": "Project",
-      "commandLineArgs": "./game/.nodes"
+      "commandLineArgs": "../../../../testGame.noctus"
     }
   }
 }

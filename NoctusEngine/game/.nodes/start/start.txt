@@ -1,3 +1,0 @@
-﻿This is the start node, where we go from here is up to you.
-This is the second line.
-$test
