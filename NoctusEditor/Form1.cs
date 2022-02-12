@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -15,6 +16,7 @@ namespace NoctusEditor
     public partial class Form1 : Form
     {
         private string RootDir { get; set; }
+        private string SourceFile { get; set; }
         private TreeNode CurrentNode { get; set; }
 
         public Form1()
@@ -24,20 +26,26 @@ namespace NoctusEditor
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            RootDir = GetDirectory();
+            SourceFile = GetDirectory();
+            if (Directory.Exists("./temp")) 
+            {
+                Directory.Delete("./temp", true);
+            }
+            ZipFile.ExtractToDirectory(SourceFile, "./temp");
+            RootDir = "./temp";
             PopulateTreeViewFromPath(RootDir, treeView1);
             treeView1.SelectedNode = treeView1.Nodes.Find("start", true)[0];
         }
 
         private string GetDirectory() 
         {
-            using (var directoryDialog = new FolderBrowserDialog() {SelectedPath = AppDomain.CurrentDomain.BaseDirectory})
+            using (var directoryDialog = new OpenFileDialog() {InitialDirectory = AppDomain.CurrentDomain.BaseDirectory, Filter = "noctus files (*.noctus)|*.noctus"})
             {
                 DialogResult result = directoryDialog.ShowDialog();
 
-                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(directoryDialog.SelectedPath))
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(directoryDialog.FileName))
                 {
-                    return directoryDialog.SelectedPath;
+                    return directoryDialog.FileName;
                 }
             }
 
@@ -80,7 +88,13 @@ namespace NoctusEditor
                 CurrentNode.Name = nameTextBox.Text;
                 (CurrentNode as TreeViewPassageNode).NodePath = $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}";
                 treeView1.Refresh();
-            }      
+            }
+
+            if (File.Exists(SourceFile)) 
+            {
+                File.Delete(SourceFile);
+            }
+            ZipFile.CreateFromDirectory("./temp", SourceFile);
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
