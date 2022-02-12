@@ -129,5 +129,38 @@ namespace NoctusEditor
                 treeView1.Refresh();
             }
         }
+
+        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog dialog = new SaveFileDialog()) 
+            {
+                dialog.AddExtension = true;
+                dialog.Filter = "noctus files (*.noctus)|*.noctus";
+                dialog.DefaultExt = ".noctus";
+                dialog.InitialDirectory = "./";
+
+                DialogResult result = dialog.ShowDialog();
+
+                if (result == DialogResult.OK && dialog.FileName != "") 
+                {
+                    SourceFile = dialog.FileName;
+                    saveToolStripMenuItem_Click(this, null);
+                }
+            }
+        }
+
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SourceFile = GetDirectory();
+            if (Directory.Exists("./temp"))
+            {
+                Directory.Delete("./temp", true);
+            }
+            treeView1.Nodes.Clear();
+            ZipFile.ExtractToDirectory(SourceFile, "./temp");
+            RootDir = "./temp";
+            PopulateTreeViewFromPath(RootDir, treeView1);
+            treeView1.SelectedNode = treeView1.Nodes.Find("start", true)[0];
+        }
     }
 }
