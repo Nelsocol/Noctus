@@ -1,1 +1,4 @@
-I've picked ${pick_one("one", "two", "three")}
+This is the start node, where we go from here is up to you.
+This is the second line.
+$test
+Let's see if this works
