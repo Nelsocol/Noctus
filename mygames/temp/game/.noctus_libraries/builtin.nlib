@@ -1,0 +1,4 @@
+function pick_one(...)
+	local args = {...}
+	return args[math.random(1, #args)]
+end

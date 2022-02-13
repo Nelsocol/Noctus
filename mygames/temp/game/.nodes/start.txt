@@ -1,0 +1,1 @@
+I've picked ${pick_one("one", "two", "three")}

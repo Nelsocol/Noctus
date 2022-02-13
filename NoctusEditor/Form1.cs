@@ -26,7 +26,7 @@ namespace NoctusEditor
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            SourceFile = GetDirectory();
+            SourceFile = "./nTemplates/default.ntemplate";
             if (Directory.Exists("./temp")) 
             {
                 Directory.Delete("./temp", true);
@@ -73,6 +73,15 @@ namespace NoctusEditor
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
+            if (!SourceFile.EndsWith(".ntemplate"))
+            {
+                saveToolStripMenuItem_Click(this, null);
+            }
+            else 
+            {
+                SaveToTemp();
+            }
+
             ClearTextFields();
             if (e.Node is TreeViewPassageNode)
             {
@@ -96,42 +105,57 @@ namespace NoctusEditor
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (CurrentNode is TreeViewPassageNode)
+            if (!SourceFile.EndsWith(".ntemplate"))
             {
-                File.WriteAllText($"{(CurrentNode as TreeViewPassageNode).NodePath}.header", headerTextBox.Text);
-                File.WriteAllText($"{(CurrentNode as TreeViewPassageNode).NodePath}.txt", passageTextBox.Text);
-                File.WriteAllText($"{(CurrentNode as TreeViewPassageNode).NodePath}.lua", luaTextBox.Text);
-                File.WriteAllText($"{(CurrentNode as TreeViewPassageNode).NodePath}.links", linksTextBox.Text);
+                SaveToTemp();
+                if (File.Exists(SourceFile))
+                {
+                    File.Delete(SourceFile);
+                }
+                ZipFile.CreateFromDirectory("./temp", SourceFile);
+            }
+            else 
+            {
+                saveAsToolStripMenuItem_Click(this, null);
+            }
+        }
 
-                if ((CurrentNode as TreeViewPassageNode).Name != nameTextBox.Text)
+        private void SaveToTemp() 
+        {
+            if (CurrentNode != null) 
+            {
+                if (CurrentNode is TreeViewPassageNode)
                 {
-                    File.Move($"{(CurrentNode as TreeViewPassageNode).NodePath}.header", $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}.header");
-                    File.Move($"{(CurrentNode as TreeViewPassageNode).NodePath}.txt", $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}.txt");
-                    File.Move($"{(CurrentNode as TreeViewPassageNode).NodePath}.lua", $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}.lua");
-                    File.Move($"{(CurrentNode as TreeViewPassageNode).NodePath}.links", $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}.links");
-                    CurrentNode.Text = nameTextBox.Text;
-                    CurrentNode.Name = nameTextBox.Text;
-                    (CurrentNode as TreeViewPassageNode).NodePath = $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}";
-                    treeView1.Refresh();
+                    File.WriteAllText($"{(CurrentNode as TreeViewPassageNode).NodePath}.header", headerTextBox.Text);
+                    File.WriteAllText($"{(CurrentNode as TreeViewPassageNode).NodePath}.txt", passageTextBox.Text);
+                    File.WriteAllText($"{(CurrentNode as TreeViewPassageNode).NodePath}.lua", luaTextBox.Text);
+                    File.WriteAllText($"{(CurrentNode as TreeViewPassageNode).NodePath}.links", linksTextBox.Text);
+
+                    if ((CurrentNode as TreeViewPassageNode).Name != nameTextBox.Text)
+                    {
+                        File.Move($"{(CurrentNode as TreeViewPassageNode).NodePath}.header", $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}.header");
+                        File.Move($"{(CurrentNode as TreeViewPassageNode).NodePath}.txt", $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}.txt");
+                        File.Move($"{(CurrentNode as TreeViewPassageNode).NodePath}.lua", $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}.lua");
+                        File.Move($"{(CurrentNode as TreeViewPassageNode).NodePath}.links", $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}.links");
+                        CurrentNode.Text = nameTextBox.Text;
+                        CurrentNode.Name = nameTextBox.Text;
+                        (CurrentNode as TreeViewPassageNode).NodePath = $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}";
+                        treeView1.Refresh();
+                    }
+                }
+                else
+                {
+                    File.WriteAllText($"{(CurrentNode as TreeViewLibNode).NodePath}.nlib", passageTextBox.Text);
+                    if ((CurrentNode as TreeViewLibNode).Name != nameTextBox.Text)
+                    {
+                        File.Move($"{(CurrentNode as TreeViewLibNode).NodePath}.nlib", $"{Path.GetDirectoryName((CurrentNode as TreeViewLibNode).NodePath)}/{nameTextBox.Text}.nlib");
+                        CurrentNode.Text = nameTextBox.Text;
+                        CurrentNode.Name = nameTextBox.Text;
+                        (CurrentNode as TreeViewLibNode).NodePath = $"{Path.GetDirectoryName((CurrentNode as TreeViewLibNode).NodePath)}/{nameTextBox.Text}";
+                        treeView1.Refresh();
+                    }
                 }
             }
-            else
-            {
-                File.WriteAllText($"{(CurrentNode as TreeViewLibNode).NodePath}.nlib", passageTextBox.Text);
-                if ((CurrentNode as TreeViewLibNode).Name != nameTextBox.Text) 
-                {
-                    File.Move($"{(CurrentNode as TreeViewLibNode).NodePath}.nlib", $"{Path.GetDirectoryName((CurrentNode as TreeViewLibNode).NodePath)}/{nameTextBox.Text}.nlib");
-                    CurrentNode.Text = nameTextBox.Text;
-                    CurrentNode.Name = nameTextBox.Text;
-                    (CurrentNode as TreeViewLibNode).NodePath = $"{Path.GetDirectoryName((CurrentNode as TreeViewLibNode).NodePath)}/{nameTextBox.Text}";
-                    treeView1.Refresh();
-                }
-            }
-            if (File.Exists(SourceFile))
-            {
-                File.Delete(SourceFile);
-            }
-            ZipFile.CreateFromDirectory("./temp", SourceFile);
         }
 
         private void ClearTextFields()

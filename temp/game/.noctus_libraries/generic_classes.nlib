@@ -1,0 +1,5 @@
+Node = {
+	NODE_ID="",
+	TAGS={},
+	ARGS={}
+}

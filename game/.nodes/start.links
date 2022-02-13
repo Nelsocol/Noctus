@@ -1,3 +1,0 @@
-To Start Node|>start
-To $test |> test1|# route="You took route 1" |< passed_arg="first arg"
-Conditional Link |> test2|?5 == 3+2 |# route="You took route 2" |< passed_arg="second arg"
