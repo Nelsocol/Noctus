@@ -54,53 +54,95 @@ namespace NoctusEditor
 
         private void PopulateTreeViewFromPath(string path, TreeView target) 
         {
+            TreeNode nodesDirectory = new TreeNode("Nodes") {Name = "Nodes"};
             foreach (string filePath in Directory.GetFiles(RootDir, "*.header", SearchOption.AllDirectories)) 
             {
-                target.Nodes.Add(new TreeViewPassageNode() { NodePath = filePath.Substring(0, filePath.Length - 7), Text = Path.GetFileNameWithoutExtension(filePath), Name = Path.GetFileNameWithoutExtension(filePath) });
+                nodesDirectory.Nodes.Add(new TreeViewPassageNode() { NodePath = filePath.Substring(0, filePath.Length - 7), Text = Path.GetFileNameWithoutExtension(filePath), Name = Path.GetFileNameWithoutExtension(filePath) });
             }
+            target.Nodes.Add(nodesDirectory);
+
+            TreeNode libDirectory = new TreeNode("Libraries") {Name = "Libraries"};
+            foreach (string filePath in Directory.GetFiles(RootDir, "*.nlib", SearchOption.AllDirectories))
+            {
+                libDirectory.Nodes.Add(new TreeViewLibNode() { NodePath = filePath.Substring(0, filePath.Length - 5), Text = Path.GetFileNameWithoutExtension(filePath), Name = Path.GetFileNameWithoutExtension(filePath) });
+            }
+            target.Nodes.Add(libDirectory);
+
             target.Refresh();
         }
 
         private void treeView1_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            headerTextBox.Text = File.ReadAllText($"{(e.Node as TreeViewPassageNode).NodePath}.header");
-            passageTextBox.Text = File.ReadAllText($"{(e.Node as TreeViewPassageNode).NodePath}.txt");
-            luaTextBox.Text = File.ReadAllText($"{(e.Node as TreeViewPassageNode).NodePath}.lua");
-            linksTextBox.Text = File.ReadAllText($"{(e.Node as TreeViewPassageNode).NodePath}.links");
-            nameTextBox.Text = Path.GetFileName((e.Node as TreeViewPassageNode).NodePath);
-            CurrentNode = e.Node;
+            ClearTextFields();
+            if (e.Node is TreeViewPassageNode)
+            {
+                headerTextBox.Enabled = passageTextBox.Enabled = luaTextBox.Enabled = linksTextBox.Enabled = nameTextBox.Enabled = true;
+                headerTextBox.Text = File.ReadAllText($"{(e.Node as TreeViewPassageNode).NodePath}.header");
+                passageTextBox.Text = File.ReadAllText($"{(e.Node as TreeViewPassageNode).NodePath}.txt");
+                luaTextBox.Text = File.ReadAllText($"{(e.Node as TreeViewPassageNode).NodePath}.lua");
+                linksTextBox.Text = File.ReadAllText($"{(e.Node as TreeViewPassageNode).NodePath}.links");
+                nameTextBox.Text = Path.GetFileName((e.Node as TreeViewPassageNode).NodePath);
+                CurrentNode = e.Node;
+            }
+            else if (e.Node is TreeViewLibNode libNode)
+            {
+                nameTextBox.Enabled = passageTextBox.Enabled = true;
+                headerTextBox.Enabled = luaTextBox.Enabled = linksTextBox.Enabled = false;
+                nameTextBox.Text = Path.GetFileName($"{libNode.NodePath}");
+                passageTextBox.Text = File.ReadAllText($"{libNode.NodePath}.nlib");
+                CurrentNode = e.Node;
+            }     
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            File.WriteAllText($"{(CurrentNode as TreeViewPassageNode).NodePath}.header", headerTextBox.Text);
-            File.WriteAllText($"{(CurrentNode as TreeViewPassageNode).NodePath}.txt", passageTextBox.Text);
-            File.WriteAllText($"{(CurrentNode as TreeViewPassageNode).NodePath}.lua", luaTextBox.Text);
-            File.WriteAllText($"{(CurrentNode as TreeViewPassageNode).NodePath}.links", linksTextBox.Text);
-
-            if ((CurrentNode as TreeViewPassageNode).Name != nameTextBox.Text) 
+            if (CurrentNode is TreeViewPassageNode)
             {
-                File.Move($"{(CurrentNode as TreeViewPassageNode).NodePath}.header", $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}.header");
-                File.Move($"{(CurrentNode as TreeViewPassageNode).NodePath}.txt", $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}.txt");
-                File.Move($"{(CurrentNode as TreeViewPassageNode).NodePath}.lua", $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}.lua");
-                File.Move($"{(CurrentNode as TreeViewPassageNode).NodePath}.links", $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}.links");
-                CurrentNode.Text = nameTextBox.Text;
-                CurrentNode.Name = nameTextBox.Text;
-                (CurrentNode as TreeViewPassageNode).NodePath = $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}";
-                treeView1.Refresh();
-            }
+                File.WriteAllText($"{(CurrentNode as TreeViewPassageNode).NodePath}.header", headerTextBox.Text);
+                File.WriteAllText($"{(CurrentNode as TreeViewPassageNode).NodePath}.txt", passageTextBox.Text);
+                File.WriteAllText($"{(CurrentNode as TreeViewPassageNode).NodePath}.lua", luaTextBox.Text);
+                File.WriteAllText($"{(CurrentNode as TreeViewPassageNode).NodePath}.links", linksTextBox.Text);
 
-            if (File.Exists(SourceFile)) 
+                if ((CurrentNode as TreeViewPassageNode).Name != nameTextBox.Text)
+                {
+                    File.Move($"{(CurrentNode as TreeViewPassageNode).NodePath}.header", $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}.header");
+                    File.Move($"{(CurrentNode as TreeViewPassageNode).NodePath}.txt", $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}.txt");
+                    File.Move($"{(CurrentNode as TreeViewPassageNode).NodePath}.lua", $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}.lua");
+                    File.Move($"{(CurrentNode as TreeViewPassageNode).NodePath}.links", $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}.links");
+                    CurrentNode.Text = nameTextBox.Text;
+                    CurrentNode.Name = nameTextBox.Text;
+                    (CurrentNode as TreeViewPassageNode).NodePath = $"{Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath)}/{nameTextBox.Text}";
+                    treeView1.Refresh();
+                }
+            }
+            else
+            {
+                File.WriteAllText($"{(CurrentNode as TreeViewLibNode).NodePath}.nlib", passageTextBox.Text);
+                if ((CurrentNode as TreeViewLibNode).Name != nameTextBox.Text) 
+                {
+                    File.Move($"{(CurrentNode as TreeViewLibNode).NodePath}.nlib", $"{Path.GetDirectoryName((CurrentNode as TreeViewLibNode).NodePath)}/{nameTextBox.Text}.nlib");
+                    CurrentNode.Text = nameTextBox.Text;
+                    CurrentNode.Name = nameTextBox.Text;
+                    (CurrentNode as TreeViewLibNode).NodePath = $"{Path.GetDirectoryName((CurrentNode as TreeViewLibNode).NodePath)}/{nameTextBox.Text}";
+                    treeView1.Refresh();
+                }
+            }
+            if (File.Exists(SourceFile))
             {
                 File.Delete(SourceFile);
             }
             ZipFile.CreateFromDirectory("./temp", SourceFile);
         }
 
+        private void ClearTextFields()
+        {
+            headerTextBox.Text = passageTextBox.Text = luaTextBox.Text = linksTextBox.Text = nameTextBox.Text = "";
+        }
+
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int suffixNumber = 1;
-            string rootDir = Path.GetDirectoryName((CurrentNode as TreeViewPassageNode).NodePath);
+            string rootDir = RootDir + "/game/.nodes/";
             while (File.Exists($"{Path.Combine(rootDir, "newNode")}{suffixNumber}.header")) 
             {
                 suffixNumber++;
@@ -111,7 +153,7 @@ namespace NoctusEditor
             File.Create($"{Path.Combine(rootDir, "newNode")}{suffixNumber}.links").Close();
 
             TreeNode newNode = new TreeViewPassageNode() { NodePath = $"{Path.Combine(rootDir, "newNode")}{suffixNumber}", Text = $"newNode{suffixNumber}", Name = $"newNode{suffixNumber}" };
-            treeView1.Nodes.Add(newNode);
+            treeView1.Nodes["Nodes"].Nodes.Add(newNode);
             treeView1.SelectedNode = newNode;
             treeView1.Refresh();
         }
@@ -120,13 +162,22 @@ namespace NoctusEditor
         {
             if (CurrentNode.Name != "start") 
             {
-                File.Delete((CurrentNode as TreeViewPassageNode).NodePath + ".header");
-                File.Delete((CurrentNode as TreeViewPassageNode).NodePath + ".txt");
-                File.Delete((CurrentNode as TreeViewPassageNode).NodePath + ".lua");
-                File.Delete((CurrentNode as TreeViewPassageNode).NodePath + ".links");
-                treeView1.Nodes.Remove(CurrentNode);
-                treeView1.SelectedNode = treeView1.Nodes["start"];
-                treeView1.Refresh();
+                if (CurrentNode is TreeViewPassageNode passageNode)
+                {
+                    File.Delete(passageNode.NodePath + ".header");
+                    File.Delete(passageNode.NodePath + ".txt");
+                    File.Delete(passageNode.NodePath + ".lua");
+                    File.Delete(passageNode.NodePath + ".links");
+                    treeView1.Nodes["Nodes"].Nodes.Remove(CurrentNode);
+                    treeView1.SelectedNode = treeView1.Nodes["Nodes"].Nodes["start"];
+                    treeView1.Refresh();
+                }
+                else
+                {
+                    File.Delete((CurrentNode as TreeViewLibNode).NodePath + ".nlib");
+                    treeView1.Nodes["Libraries"].Nodes.Remove(CurrentNode);
+                    treeView1.SelectedNode = treeView1.Nodes["Nodes"].Nodes["start"];
+                }
             }
         }
 
@@ -161,6 +212,22 @@ namespace NoctusEditor
             RootDir = "./temp";
             PopulateTreeViewFromPath(RootDir, treeView1);
             treeView1.SelectedNode = treeView1.Nodes.Find("start", true)[0];
+        }
+
+        private void newLibToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int suffixNumber = 1;
+            string rootDir = RootDir + "/game/.noctus_libraries/";
+            while (File.Exists($"{Path.Combine(rootDir, "newLib")}{suffixNumber}.nlib"))
+            {
+                suffixNumber++;
+            }
+            File.Create($"{Path.Combine(rootDir, "newLib")}{suffixNumber}.nlib").Close();
+
+            TreeNode newNode = new TreeViewLibNode() { NodePath = $"{Path.Combine(rootDir, "newLib")}{suffixNumber}", Text = $"newLib{suffixNumber}", Name = $"newLib{suffixNumber}" };
+            treeView1.Nodes["Libraries"].Nodes.Add(newNode);
+            treeView1.SelectedNode = newNode;
+            treeView1.Refresh();
         }
     }
 }
