@@ -37,10 +37,10 @@ namespace NoctusEngine
             LuaContext.DoString("METADATA = {}");
             foreach (string file in Directory.EnumerateFiles(rootDir, "*.header", SearchOption.AllDirectories)) 
             {
-                LuaContext.DoString($"CURRENT_NODE=METADATA.start");
                 LuaContext.DoString($"METADATA[\"{Path.GetFileNameWithoutExtension(file)}\"] = {{{File.ReadAllText(file)}}}");
                 LuaContext.DoString($"setmetatable(METADATA[\"{Path.GetFileNameWithoutExtension(file)}\"], Node)");
             }
+            LuaContext.DoString($"CURRENT_NODE=METADATA.start");
         }
 
         private void RunNlibFiles()

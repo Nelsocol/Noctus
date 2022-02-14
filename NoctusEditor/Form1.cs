@@ -226,11 +226,12 @@ namespace NoctusEditor
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            CurrentNode = null;
             SourceFile = GetDirectory();
             if (Directory.Exists("./temp"))
             {
                 Directory.Delete("./temp", true);
-            }
+            }     
             treeView1.Nodes.Clear();
             ZipFile.ExtractToDirectory(SourceFile, "./temp");
             RootDir = "./temp";

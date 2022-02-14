@@ -1,1 +1,1 @@
-test="Let's see how this goes."
+CURRENT_NODE.life = METADATA.start.life - 1

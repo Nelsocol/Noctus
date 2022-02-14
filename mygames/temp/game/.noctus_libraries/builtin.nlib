@@ -1,0 +1,13 @@
+function pick_one(...)
+	local args = {...}
+	return args[math.random(1, #args)]
+end
+
+function either(condition, ifcase, elsecase)
+	if condition then
+		return ifcase
+	else
+		return elsecase
+	end
+end
+

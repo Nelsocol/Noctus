@@ -1,2 +1,0 @@
-This is a stub passage. This is to see if I can insert it into another passage.
-This is a local variable: $innertest

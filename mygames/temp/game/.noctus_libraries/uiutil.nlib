@@ -1,0 +1,6 @@
+function status_bar(value, max)
+	returnString = "["
+	for i=0,value-1 do returnString = returnString .. "." end
+	for i=max-1,value,-1 do returnString = returnString .. "X" end
+	return returnString .. "]"
+end
