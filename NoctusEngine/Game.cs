@@ -18,6 +18,8 @@ namespace NoctusEngine
 
         public Game(string gameDirectory) 
         {
+            //TODO: This should be in output channel.
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
             if (Directory.Exists("./temp")) 
             {
                 Directory.Delete("./temp", true);
@@ -27,8 +29,8 @@ namespace NoctusEngine
             LuaContext = new Lua();
             Parser = new NoctusTextParser(LuaContext);
             InputChannel = new ConsoleInputChannel();
-            BuildMetadataTree();
             RunNlibFiles();
+            BuildMetadataTree();
             CurrentNode = "start";
         }
 
@@ -65,9 +67,16 @@ namespace NoctusEngine
                 //Individually present each line from the txt file
                 foreach (string line in passageLines) 
                 {
-                    Console.WriteLine(line);
-                    Console.ReadKey(true);
+                    if (line != null)
+                    {
+                        Console.WriteLine(line);
+                    }
+                    else 
+                    {
+                        Console.ReadKey(true);
+                    }
                 }
+                Console.ReadKey(true);
 
                 //Present links and direct game flow to one selected link.
                 int counter = 1;

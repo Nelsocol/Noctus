@@ -1,6 +1,25 @@
 function status_bar(value, max)
+	if value < 0 then
+		value = 0
+	elseif value > max then
+		value = max
+	end
 	returnString = "["
-	for i=0,value-1 do returnString = returnString .. "." end
-	for i=max-1,value,-1 do returnString = returnString .. "X" end
+	for i=0,value-1 do returnString = returnString .. "#" end
+	for i=max-1,value,-1 do returnString = returnString .. "~" end
 	return returnString .. "]"
+end
+
+function percentage_bar(value, max)
+	if value < 0 then
+		value = 0
+	elseif value > max then
+		value = max
+	end
+	returnString = "["
+	local percentvalue = (value/max) * 10
+	local truncvalue = math.floor(percentvalue)
+	for i=0,truncvalue-1 do returnString = returnString .. "#" end
+	for i=9,truncvalue,-1 do returnString = returnString .. "~" end
+	return returnString .. "] " .. string.format("%6.2f", percentvalue * 10) .. "%"
 end

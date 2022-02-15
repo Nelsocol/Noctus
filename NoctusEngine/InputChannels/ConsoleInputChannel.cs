@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NoctusEngine
 {
-    public class ConsoleInputChannel: IInputChannel
+    public class ConsoleInputChannel : IInputChannel
     {
         public Link SelectLink(List<Link> links)
         {

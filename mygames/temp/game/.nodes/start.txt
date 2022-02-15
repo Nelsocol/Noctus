@@ -1,3 +1,5 @@
-Life: ${status_bar(METADATA.start.life,10)}
+Life: ${status_bar(CURRENT_NODE.life,17)}    Percent: ${percentage_bar(CURRENT_NODE.life,17)}
 Testing pick_one: ${pick_one("one", "two", "three")}
 Testing ifelse: ${either(true, "True case", "False Case")} -> ${either(false, "True case", "False Case")}
+##
+${pick_scenario("scenario1", "scenario2")}

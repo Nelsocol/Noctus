@@ -1,1 +1,1 @@
-CURRENT_NODE.life = METADATA.start.life - 1
+CURRENT_NODE.life = CURRENT_NODE.life + 1

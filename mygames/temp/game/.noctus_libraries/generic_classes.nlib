@@ -1,5 +1,6 @@
 Node = {
 	NODE_ID="",
 	TAGS={},
-	ARGS={}
+	ARGS={},
+	SCENARIO_ACTIVE= function() return true end
 }

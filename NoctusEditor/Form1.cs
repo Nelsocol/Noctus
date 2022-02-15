@@ -88,6 +88,7 @@ namespace NoctusEditor
                 headerTextBox.Enabled = passageTextBox.Enabled = luaTextBox.Enabled = linksTextBox.Enabled = nameTextBox.Enabled = true;
                 headerTextBox.Text = File.ReadAllText($"{(e.Node as TreeViewPassageNode).NodePath}.header");
                 passageTextBox.Text = File.ReadAllText($"{(e.Node as TreeViewPassageNode).NodePath}.txt");
+                passageTextBox.WordWrap = true;
                 luaTextBox.Text = File.ReadAllText($"{(e.Node as TreeViewPassageNode).NodePath}.lua");
                 linksTextBox.Text = File.ReadAllText($"{(e.Node as TreeViewPassageNode).NodePath}.links");
                 nameTextBox.Text = Path.GetFileName((e.Node as TreeViewPassageNode).NodePath);
@@ -99,24 +100,28 @@ namespace NoctusEditor
                 headerTextBox.Enabled = luaTextBox.Enabled = linksTextBox.Enabled = false;
                 nameTextBox.Text = Path.GetFileName($"{libNode.NodePath}");
                 passageTextBox.Text = File.ReadAllText($"{libNode.NodePath}.nlib");
+                passageTextBox.WordWrap = false;
                 CurrentNode = e.Node;
             }     
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!SourceFile.EndsWith(".ntemplate"))
+            if (SourceFile != "")
             {
-                SaveToTemp();
-                if (File.Exists(SourceFile))
+                if (!SourceFile.EndsWith(".ntemplate"))
                 {
-                    File.Delete(SourceFile);
+                    SaveToTemp();
+                    if (File.Exists(SourceFile))
+                    {
+                        File.Delete(SourceFile);
+                    }
+                    ZipFile.CreateFromDirectory("./temp", SourceFile);
                 }
-                ZipFile.CreateFromDirectory("./temp", SourceFile);
-            }
-            else 
-            {
-                saveAsToolStripMenuItem_Click(this, null);
+                else
+                {
+                    saveAsToolStripMenuItem_Click(this, null);
+                }
             }
         }
 
@@ -188,11 +193,13 @@ namespace NoctusEditor
             {
                 if (CurrentNode is TreeViewPassageNode passageNode)
                 {
-                    File.Delete(passageNode.NodePath + ".header");
-                    File.Delete(passageNode.NodePath + ".txt");
-                    File.Delete(passageNode.NodePath + ".lua");
-                    File.Delete(passageNode.NodePath + ".links");
-                    treeView1.Nodes["Nodes"].Nodes.Remove(CurrentNode);
+                    File.Delete($"{passageNode.NodePath}.header");
+                    File.Delete($"{passageNode.NodePath}.txt");
+                    File.Delete($"{passageNode.NodePath}.lua");
+                    File.Delete($"{passageNode.NodePath}.links");
+                    TreeNode cachedNode = CurrentNode;
+                    CurrentNode = null;
+                    treeView1.Nodes["Nodes"].Nodes.Remove(cachedNode);
                     treeView1.SelectedNode = treeView1.Nodes["Nodes"].Nodes["start"];
                     treeView1.Refresh();
                 }

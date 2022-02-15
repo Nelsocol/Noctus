@@ -30,42 +30,58 @@ namespace NoctusEngine
 
         public List<string> ParsePassage(string rawText, string rootdirectory) 
         {
-            List<StringBuilder> parsedLines = new List<StringBuilder>();
-            StringBuilder currentLine = new StringBuilder();
-
-            bool recursivePotential = false;
-            string[] lines = rawText.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
-            foreach (string line in lines) {
-                string[] splitLine = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                for (int i = 0; i < splitLine.Count(); i++)
-                {           
-                    currentLine.Append($"{ParseWord(splitLine, rootdirectory, ref i, ref recursivePotential)} ");
-                }
-
-                parsedLines.Add(currentLine);
-                currentLine = new StringBuilder();
-            }
-
-            //Handles the recursive step to recursively evaluate passages
-            List<string> recursiveReturnList = new List<string>();
-            if (recursivePotential)
+            if (rawText != null)
             {
-                foreach (string line in parsedLines.Select(e => e.ToString().Trim()))
+                List<StringBuilder> parsedLines = new List<StringBuilder>();
+                StringBuilder currentLine = new StringBuilder();
+
+                bool recursivePotential = false;
+                string[] lines = rawText.Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
+                foreach (string line in lines)
                 {
-                    recursiveReturnList.AddRange(ParsePassage(line, rootdirectory));
+                    if (line == "##")
+                    {
+                        parsedLines.Add(null);
+                    }
+                    else
+                    {
+                        string[] splitLine = line.Split(new string[] { " ", "\n\r" }, StringSplitOptions.RemoveEmptyEntries);
+
+                        for (int i = 0; i < splitLine.Count(); i++)
+                        {
+                            currentLine.Append($"{ParseWord(splitLine, rootdirectory, ref i, ref recursivePotential)} ");
+                        }
+
+                        parsedLines.Add(currentLine);
+                        currentLine = new StringBuilder();
+                    }
                 }
+
+                //Handles the recursive step to recursively evaluate passages
+                List<string> recursiveReturnList = new List<string>();
+                if (recursivePotential)
+                {
+                    foreach (string line in parsedLines.Select(e => e == null ? null : e.ToString().Trim()))
+                    {
+                        recursiveReturnList.AddRange(ParsePassage(line, rootdirectory));
+                    }
+                }
+                else
+                {
+                    recursiveReturnList = parsedLines.Select(e => e == null ? null : e.ToString().Trim()).ToList();
+                }
+
+                return recursiveReturnList;
             }
-            else 
+            else
             {
-                recursiveReturnList = parsedLines.Select(e => e.ToString().Trim()).ToList();
+                return new List<string>() { null };
             }
-                  
-            return recursiveReturnList;
         }
 
         private string ParseWord(string[] line,string rootDirectory, ref int iterator, ref bool recursivePotential) 
         {
+
             if (line[iterator].StartsWith("${"))
             {
                 recursivePotential = true;

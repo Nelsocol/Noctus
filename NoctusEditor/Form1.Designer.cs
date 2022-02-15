@@ -141,7 +141,7 @@ namespace NoctusEditor
             this.nameTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(19)))), ((int)(((byte)(19)))), ((int)(((byte)(21)))));
             this.nameTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.nameTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.nameTextBox.Font = new System.Drawing.Font("Baskerville Old Face", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.nameTextBox.Font = new System.Drawing.Font("Cascadia Mono", 22.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.nameTextBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(250)))), ((int)(((byte)(248)))));
             this.nameTextBox.Location = new System.Drawing.Point(0, 0);
             this.nameTextBox.Margin = new System.Windows.Forms.Padding(0);
@@ -173,14 +173,16 @@ namespace NoctusEditor
             this.passageTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(19)))), ((int)(((byte)(19)))), ((int)(((byte)(21)))));
             this.passageTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.passageTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.passageTextBox.Font = new System.Drawing.Font("Baskerville Old Face", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.passageTextBox.Font = new System.Drawing.Font("Cascadia Mono", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.passageTextBox.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(251)))), ((int)(((byte)(250)))), ((int)(((byte)(248)))));
             this.passageTextBox.Location = new System.Drawing.Point(0, 0);
             this.passageTextBox.Margin = new System.Windows.Forms.Padding(0);
             this.passageTextBox.Multiline = true;
             this.passageTextBox.Name = "passageTextBox";
+            this.passageTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.passageTextBox.Size = new System.Drawing.Size(621, 434);
             this.passageTextBox.TabIndex = 0;
+            this.passageTextBox.WordWrap = false;
             // 
             // splitContainer3
             // 
@@ -309,7 +311,7 @@ namespace NoctusEditor
             this.newToolStripMenuItem.ForeColor = System.Drawing.Color.White;
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(216, 26);
             this.newToolStripMenuItem.Text = "New Node";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
@@ -319,7 +321,7 @@ namespace NoctusEditor
             this.newLibToolStripMenuItem.ForeColor = System.Drawing.Color.White;
             this.newLibToolStripMenuItem.Name = "newLibToolStripMenuItem";
             this.newLibToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
-            this.newLibToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.newLibToolStripMenuItem.Size = new System.Drawing.Size(216, 26);
             this.newLibToolStripMenuItem.Text = "New Lib";
             this.newLibToolStripMenuItem.Click += new System.EventHandler(this.newLibToolStripMenuItem_Click);
             // 
@@ -329,7 +331,7 @@ namespace NoctusEditor
             this.deleteToolStripMenuItem.ForeColor = System.Drawing.Color.White;
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             this.deleteToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Delete)));
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(216, 26);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 

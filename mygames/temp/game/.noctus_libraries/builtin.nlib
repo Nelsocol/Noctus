@@ -11,3 +11,18 @@ function either(condition, ifcase, elsecase)
 	end
 end
 
+function pick_scenario(...)
+	local args = {...}
+	local return_args = {}
+	for i=1, #args do
+		if METADATA[args[i]].SCENARIO_ACTIVE() then
+			table.insert(return_args, args[i])
+		end
+	end
+	if #return_args == 0 then
+		return ""
+	else 
+		return "$>" .. return_args[math.random(1, #return_args)]
+	end
+end
+
